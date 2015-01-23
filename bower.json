@@ -1,0 +1,27 @@
+{
+  "name": "meteorite",
+  "version": "1.0.0",
+  "authors": [
+    "Dean Radcliffe <deanmisc@yahoo.com>"
+  ],
+  "description": "Client-side components of MeteorJS. Tracker (renamed Meteorite).",
+  "main": "meteorite-packages.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "reactive",
+    "FRP",
+    "Meteor",
+    "MeteorJS",
+    "rx"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
