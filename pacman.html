@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> - jsFiddle demo by chicagogrooves</title>
+  <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script type='text/javascript' src="https://s3.amazonaws.com/www.chicagogrooves.com/js/meteorite-package.min.js"></script>
+
+  <script type='text/javascript'>
+  $(window).load(function(){
+
+    // Declare our model
+    arc = new ReactiveObject({
+      radius: 50,
+      closed: 0,
+      sweep: 1,
+      largeArc: 1
+    });
+
+    // Declare how UI events will update the model
+    $("input[type=range]").on("input", function(e){
+      arc.radius = Number($(this).val());
+    });
+    $("input[type=radio]").on("change", function (e) {
+      var name = $(this).attr('name');
+      arc[name] = Number($("input[name=" + name + "]:checked").val())
+    });
+
+    // Provide a function which updates the view from the model
+    // Special sauce: The model fields on which this function
+    //   depends are automatically figured out the first time
+    //   the function is run. When those fields change (in batches
+    //    or singly), the function is rerun.
+    Meteorite.run(function(){
+      $("#line-arc").attr("d",
+      "M 100,100 L220,60  A "+
+      arc.radius + "," + arc.radius +
+      " 1 " + arc.largeArc +
+      "," + arc.sweep +
+      " 220,140" + (arc.closed==1 ? "Z" : ""));
+    });
+
+    // THAT'S ALL, FOLKS!
+    // * No littering your HTML markup with pseudo-language (ala Angular)
+    // * No verbose syntax and manual dependency tracking (ala Ember)
+    // * Just functions that run, and do the right thing.
+  });//]]>
+
+</script>
+
+
+</head>
+<body>
+
+  <h1>Make a Pac-Man</h1>
+  <p>
+    An interactive tutorial for playing with properties of an SVG Arc command, part of the SVG Path Spec.
+
+    Inspiration: <a href="http://tutorials.jenkov.com/svg/path-element.html#arcs">Jenkov's tutorial</a>.
+  </p>
+  <p>
+    Suggestion: Open Dev Tools and watch the path of the SVG change as you fiddle with the parameters. Go to the <a href="http://meteorpad.com/pad/EGBof8H6ztcusmcbv/SVG">MeteorPad</a> to see the full source.
+  </p>
+
+  <div style="float:left">
+    <svg width="300" height="200" style="border: 1px solid black">
+      <path id="line-arc" d="M 100,100 L140,120  A 50, 50 1 1,1 70,70Z" fill="yellow" stroke="black" stroke-width="2"></path>
+    </svg>
+  </div>
+
+  <div style="float:left; margin-left: 3em;">
+    <form novalidate="novalidate">
+
+      <div class="form-group">
+
+        <div class="form-group">
+
+          <label class="control-label">Radius</label>
+
+          <input type="range" name="radius" required="" data-schema-key="radius">
+
+          <span class="help-block"></span>
+        </div>
+        <div class="form-group">
+          <label class="control-label">large-arc</label>
+          <div class="af-radio-group" data-schema-key="largeArc">
+            <div class="radio">
+              <label>
+                <input type="radio" value="0" name="largeArc" required="">
+                0
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" value="1" name="largeArc" required="" checked="1">
+                1
+              </label>
+            </div>
+          </div>
+          <span class="help-block"></span>
+        </div>
+        <div class="form-group">
+          <label class="control-label">Close the Path?</label>
+          <div class="af-radio-group" data-schema-key="closed">
+
+            <div class="radio">
+              <label>
+                <input type="radio" value="0" name="closed" required="" checked="1">
+                0
+              </label>
+            </div>
+
+            <div class="radio">
+              <label>
+                <input type="radio" value="1" name="closed" required="">
+                1
+              </label>
+            </div>
+          </div>
+          <span class="help-block"></span>
+        </div>
+        <div class="form-group">
+          <label class="control-label">Sweep</label>
+          <div class="af-radio-group" data-schema-key="sweep">
+            <div class="radio">
+              <label>
+                <input type="radio" value="0" name="sweep" required="">
+                0
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" value="1" name="sweep" required="" checked="1">
+                1
+              </label>
+            </div>
+          </div>
+          <span class="help-block"></span>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div style="clear:both">
+    <p>
+      The language for SVG paths and arcs is a bit hard to read without knowing what each field does. Can you say which is the "large-arc" parameter in the expression "A 50, 50 1 1,1 70,70Z", and what part of it closes the path?
+    </p>
+    <p>
+      Meteor wins by letting you create template expressions like: "#{arc.radius}, #{arc.radius} 1 #{arc.largeArc},#{arc.sweep} 70,70" + (if arc.closed is 1 then "Z" else "")". This lets me name the fields, and use expressions, like in the case of the 'closed' which requires a 'Z'. But it is still close to the original SVG specification. Since the arc string is built in a reactive helper, and since the object which holds the arc properties is reactive, changes to the object are immediately reflected in the drawn SVG.
+    </p>
+  </div>
+</body>
+
+
+</html>
