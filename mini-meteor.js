@@ -1,9 +1,9 @@
-/* This file contains underscore, and
- * 5 core meteor packages:
+/* This file contains underscore, and exports
+ * 5 core meteor packages, and their globals
  *
  * Base64
  * EJSON
- * Meteorite (formerly Tracker/Deps)
+ * Meteor (a rename of Tracker/Deps, with autorun renamed to 'run')
  * ReactiveMap (formerly ReactiveDict)
  * ReactiveVar
  * mrt:reactive-object ReactiveObject
@@ -672,32 +672,32 @@ EJSON.clone = function (v) {
 // also have to use 'base64'.)
 EJSON.newBinary = Base64.newBinary;
 /** end meteor/meteor/packages/ejson/ejson.js@ccfee68 **/
-/** begin meteor/meteor/packages/Meteorite/Meteorite.js@c9857ea **/
+/** begin meteor/meteor/packages/Meteor/Meteor.js@c9857ea **/
 //////////////////////////////////////////////////
-// Package docs at http://docs.meteor.com/#Meteorite //
+// Package docs at http://docs.meteor.com/#Meteor //
 //////////////////////////////////////////////////
 
-Meteorite = {};
+Meteor = {};
 
-// http://docs.meteor.com/#Meteorite_active
+// http://docs.meteor.com/#Meteor_active
 
 /**
  * @summary True if there is a current computation, meaning that dependencies on reactive data sources will be tracked and potentially cause the current computation to be rerun.
  * @locus Client
  */
-Meteorite.active = false;
+Meteor.active = false;
 
-// http://docs.meteor.com/#Meteorite_currentcomputation
+// http://docs.meteor.com/#Meteor_currentcomputation
 
 /**
- * @summary The current computation, or `null` if there isn't one.  The current computation is the [`Meteorite.Computation`](#Meteorite_computation) object created by the innermost active call to `Meteorite.run`, and it's the computation that gains dependencies when reactive data sources are accessed.
+ * @summary The current computation, or `null` if there isn't one.  The current computation is the [`Meteor.Computation`](#Meteor_computation) object created by the innermost active call to `Meteor.run`, and it's the computation that gains dependencies when reactive data sources are accessed.
  * @locus Client
  */
-Meteorite.currentComputation = null;
+Meteor.currentComputation = null;
 
 var setCurrentComputation = function (c) {
-  Meteorite.currentComputation = c;
-  Meteorite.active = !! c;
+  Meteor.currentComputation = c;
+  Meteor.active = !! c;
 };
 
 var _debugFunc = function () {
@@ -727,7 +727,7 @@ var _throwOrLog = function (from, e) {
     } else {
       messageAndStack = e.stack || e.message;
     }
-    _debugFunc()("Exception from Meteorite " + from + " function:",
+    _debugFunc()("Exception from Meteor " + from + " function:",
                  messageAndStack);
   }
 };
@@ -753,17 +753,17 @@ var withNoYieldsAllowed = function (f) {
 var nextId = 1;
 // computations whose callbacks we should call at flush time
 var pendingComputations = [];
-// `true` if a Meteorite.flush is scheduled, or if we are in Meteorite.flush now
+// `true` if a Meteor.flush is scheduled, or if we are in Meteor.flush now
 var willFlush = false;
-// `true` if we are in Meteorite.flush now
+// `true` if we are in Meteor.flush now
 var inFlush = false;
 // `true` if we are computing a computation now, either first time
-// or recompute.  This matches Meteorite.active unless we are inside
-// Meteorite.nonreactive, which nullfies currentComputation even though
+// or recompute.  This matches Meteor.active unless we are inside
+// Meteor.nonreactive, which nullfies currentComputation even though
 // an enclosing computation may still be running.
 var inCompute = false;
 // `true` if the `_throwFirstError` option was passed in to the call
-// to Meteorite.flush that we are in. When set, throw rather than log the
+// to Meteor.flush that we are in. When set, throw rather than log the
 // first error encountered while flushing. Before throwing the error,
 // finish flushing (from a finally block), logging any subsequent
 // errors.
@@ -773,31 +773,31 @@ var afterFlushCallbacks = [];
 
 var requireFlush = function () {
   if (! willFlush) {
-    setTimeout(Meteorite.flush, 0);
+    setTimeout(Meteor.flush, 0);
     willFlush = true;
   }
 };
 
-// Meteorite.Computation constructor is visible but private
+// Meteor.Computation constructor is visible but private
 // (throws an error if you try to call it)
 var constructingComputation = false;
 
 //
-// http://docs.meteor.com/#Meteorite_computation
+// http://docs.meteor.com/#Meteor_computation
 
 /**
  * @summary A Computation object represents code that is repeatedly rerun
  * in response to
  * reactive data changes. Computations don't have return values; they just
  * perform actions, such as rerendering a template on the screen. Computations
- * are created using Meteorite.run. Use stop to prevent further rerunning of a
+ * are created using Meteor.run. Use stop to prevent further rerunning of a
  * computation.
  * @instancename computation
  */
-Meteorite.Computation = function (f, parent) {
+Meteor.Computation = function (f, parent) {
   if (! constructingComputation)
     throw new Error(
-      "Meteorite.Computation constructor is private; use Meteorite.run");
+      "Meteor.Computation constructor is private; use Meteor.run");
   constructingComputation = false;
 
   var self = this;
@@ -807,7 +807,7 @@ Meteorite.Computation = function (f, parent) {
   /**
    * @summary True if this computation has been stopped.
    * @locus Client
-   * @memberOf Meteorite.Computation
+   * @memberOf Meteor.Computation
    * @instance
    * @name  stopped
    */
@@ -818,7 +818,7 @@ Meteorite.Computation = function (f, parent) {
   /**
    * @summary True if this computation has been invalidated (and not yet rerun), or if it has been stopped.
    * @locus Client
-   * @memberOf Meteorite.Computation
+   * @memberOf Meteor.Computation
    * @instance
    * @name  invalidated
    */
@@ -827,9 +827,9 @@ Meteorite.Computation = function (f, parent) {
   // http://docs.meteor.com/#computation_firstrun
 
   /**
-   * @summary True during the initial run of the computation at the time `Meteorite.run` is called, and false on subsequent reruns and at other times.
+   * @summary True during the initial run of the computation at the time `Meteor.run` is called, and false on subsequent reruns and at other times.
    * @locus Client
-   * @memberOf Meteorite.Computation
+   * @memberOf Meteor.Computation
    * @instance
    * @name  firstRun
    */
@@ -861,14 +861,14 @@ Meteorite.Computation = function (f, parent) {
  * @locus Client
  * @param {Function} callback Function to be called on invalidation. Receives one argument, the computation that was invalidated.
  */
-Meteorite.Computation.prototype.onInvalidate = function (f) {
+Meteor.Computation.prototype.onInvalidate = function (f) {
   var self = this;
 
   if (typeof f !== 'function')
     throw new Error("onInvalidate requires a function");
 
   if (self.invalidated) {
-    Meteorite.nonreactive(function () {
+    Meteor.nonreactive(function () {
       withNoYieldsAllowed(f)(self);
     });
   } else {
@@ -882,7 +882,7 @@ Meteorite.Computation.prototype.onInvalidate = function (f) {
  * @summary Invalidates this computation so that it will be rerun.
  * @locus Client
  */
-Meteorite.Computation.prototype.invalidate = function () {
+Meteor.Computation.prototype.invalidate = function () {
   var self = this;
   if (! self.invalidated) {
     // if we're currently in _recompute(), don't enqueue
@@ -897,7 +897,7 @@ Meteorite.Computation.prototype.invalidate = function () {
     // callbacks can't add callbacks, because
     // self.invalidated === true.
     for(var i = 0, f; f = self._onInvalidateCallbacks[i]; i++) {
-      Meteorite.nonreactive(function () {
+      Meteor.nonreactive(function () {
         withNoYieldsAllowed(f)(self);
       });
     }
@@ -911,18 +911,18 @@ Meteorite.Computation.prototype.invalidate = function () {
  * @summary Prevents this computation from rerunning.
  * @locus Client
  */
-Meteorite.Computation.prototype.stop = function () {
+Meteor.Computation.prototype.stop = function () {
   if (! this.stopped) {
     this.stopped = true;
     this.invalidate();
   }
 };
 
-Meteorite.Computation.prototype._compute = function () {
+Meteor.Computation.prototype._compute = function () {
   var self = this;
   self.invalidated = false;
 
-  var previous = Meteorite.currentComputation;
+  var previous = Meteor.currentComputation;
   setCurrentComputation(self);
   var previousInCompute = inCompute;
   inCompute = true;
@@ -934,7 +934,7 @@ Meteorite.Computation.prototype._compute = function () {
   }
 };
 
-Meteorite.Computation.prototype._recompute = function () {
+Meteor.Computation.prototype._recompute = function () {
   var self = this;
 
   self._recomputing = true;
@@ -958,7 +958,7 @@ Meteorite.Computation.prototype._recompute = function () {
 };
 
 //
-// http://docs.meteor.com/#Meteorite_dependency
+// http://docs.meteor.com/#Meteor_dependency
 
 /**
  * @summary A Dependency represents an atomic unit of reactive data that a
@@ -969,7 +969,7 @@ Meteorite.Computation.prototype._recompute = function () {
  * @class
  * @instanceName dependency
  */
-Meteorite.Dependency = function () {
+Meteor.Dependency = function () {
   this._dependentsById = {};
 };
 
@@ -987,14 +987,14 @@ If there is no current computation and `depend()` is called with no arguments, i
 
 Returns true if the computation is a new dependent of `dependency` rather than an existing one.
  * @locus Client
- * @param {Meteorite.Computation} [fromComputation] An optional computation declared to depend on `dependency` instead of the current computation.
+ * @param {Meteor.Computation} [fromComputation] An optional computation declared to depend on `dependency` instead of the current computation.
  */
-Meteorite.Dependency.prototype.depend = function (computation) {
+Meteor.Dependency.prototype.depend = function (computation) {
   if (! computation) {
-    if (! Meteorite.active)
+    if (! Meteor.active)
       return false;
 
-    computation = Meteorite.currentComputation;
+    computation = Meteor.currentComputation;
   }
   var self = this;
   var id = computation._id;
@@ -1014,7 +1014,7 @@ Meteorite.Dependency.prototype.depend = function (computation) {
  * @summary Invalidate all dependent computations immediately and remove them as dependents.
  * @locus Client
  */
-Meteorite.Dependency.prototype.changed = function () {
+Meteor.Dependency.prototype.changed = function () {
   var self = this;
   for (var id in self._dependentsById)
     self._dependentsById[id].invalidate();
@@ -1026,36 +1026,36 @@ Meteorite.Dependency.prototype.changed = function () {
  * @summary True if this Dependency has one or more dependent Computations, which would be invalidated if this Dependency were to change.
  * @locus Client
  */
-Meteorite.Dependency.prototype.hasDependents = function () {
+Meteor.Dependency.prototype.hasDependents = function () {
   var self = this;
   for(var id in self._dependentsById)
     return true;
   return false;
 };
 
-// http://docs.meteor.com/#Meteorite_flush
+// http://docs.meteor.com/#Meteor_flush
 
 /**
  * @summary Process all reactive updates immediately and ensure that all invalidated computations are rerun.
  * @locus Client
  */
-Meteorite.flush = function (_opts) {
+Meteor.flush = function (_opts) {
   // XXX What part of the comment below is still true? (We no longer
   // have Spark)
   //
   // Nested flush could plausibly happen if, say, a flush causes
   // DOM mutation, which causes a "blur" event, which runs an
-  // app event handler that calls Meteorite.flush.  At the moment
+  // app event handler that calls Meteor.flush.  At the moment
   // Spark blocks event handlers during DOM mutation anyway,
   // because the LiveRange tree isn't valid.  And we don't have
   // any useful notion of a nested flush.
   //
   // https://app.asana.com/0/159908330244/385138233856
   if (inFlush)
-    throw new Error("Can't call Meteorite.flush while flushing");
+    throw new Error("Can't call Meteor.flush while flushing");
 
   if (inCompute)
-    throw new Error("Can't flush inside Meteorite.run");
+    throw new Error("Can't flush inside Meteor.run");
 
   inFlush = true;
   willFlush = true;
@@ -1087,15 +1087,15 @@ Meteorite.flush = function (_opts) {
   } finally {
     if (! finishedTry) {
       // we're erroring
-      inFlush = false; // needed before calling `Meteorite.flush()` again
-      Meteorite.flush({_throwFirstError: false}); // finish flushing
+      inFlush = false; // needed before calling `Meteor.flush()` again
+      Meteor.flush({_throwFirstError: false}); // finish flushing
     }
     willFlush = false;
     inFlush = false;
   }
 };
 
-// http://docs.meteor.com/#Meteorite_run
+// http://docs.meteor.com/#Meteor_run
 //
 // Run f(). Record its dependencies. Rerun it whenever the
 // dependencies change.
@@ -1110,22 +1110,22 @@ Meteorite.flush = function (_opts) {
  * @locus Client
  * @param {Function} runFunc The function to run. It receives one argument: the Computation object that will be returned.
  */
-Meteorite.run = function (f) {
+Meteor.run = function (f) {
   if (typeof f !== 'function')
-    throw new Error('Meteorite.run requires a function argument');
+    throw new Error('Meteor.run requires a function argument');
 
   constructingComputation = true;
-  var c = new Meteorite.Computation(f, Meteorite.currentComputation);
+  var c = new Meteor.Computation(f, Meteor.currentComputation);
 
-  if (Meteorite.active)
-    Meteorite.onInvalidate(function () {
+  if (Meteor.active)
+    Meteor.onInvalidate(function () {
       c.stop();
     });
 
   return c;
 };
 
-// http://docs.meteor.com/#Meteorite_nonreactive
+// http://docs.meteor.com/#Meteor_nonreactive
 //
 // Run `f` with no current computation, returning the return value
 // of `f`.  Used to turn off reactivity for the duration of `f`,
@@ -1137,8 +1137,8 @@ Meteorite.run = function (f) {
  * @locus Client
  * @param {Function} func A function to call immediately.
  */
-Meteorite.nonreactive = function (f) {
-  var previous = Meteorite.currentComputation;
+Meteor.nonreactive = function (f) {
+  var previous = Meteor.currentComputation;
   setCurrentComputation(null);
   try {
     return f();
@@ -1147,32 +1147,32 @@ Meteorite.nonreactive = function (f) {
   }
 };
 
-// http://docs.meteor.com/#Meteorite_oninvalidate
+// http://docs.meteor.com/#Meteor_oninvalidate
 
 /**
  * @summary Registers a new [`onInvalidate`](#computation_oninvalidate) callback on the current computation (which must exist), to be called immediately when the current computation is invalidated or stopped.
  * @locus Client
  * @param {Function} callback A callback function that will be invoked as `func(c)`, where `c` is the computation on which the callback is registered.
  */
-Meteorite.onInvalidate = function (f) {
-  if (! Meteorite.active)
-    throw new Error("Meteorite.onInvalidate requires a currentComputation");
+Meteor.onInvalidate = function (f) {
+  if (! Meteor.active)
+    throw new Error("Meteor.onInvalidate requires a currentComputation");
 
-  Meteorite.currentComputation.onInvalidate(f);
+  Meteor.currentComputation.onInvalidate(f);
 };
 
-// http://docs.meteor.com/#Meteorite_afterflush
+// http://docs.meteor.com/#Meteor_afterflush
 
 /**
  * @summary Schedules a function to be called during the next flush, or later in the current flush if one is in progress, after all invalidated computations have been rerun.  The function will be run once and not on subsequent flushes unless `afterFlush` is called again.
  * @locus Client
  * @param {Function} callback A function to call at flush time.
  */
-Meteorite.afterFlush = function (f) {
+Meteor.afterFlush = function (f) {
   afterFlushCallbacks.push(f);
   requireFlush();
 };
-/** end meteor/meteor/packages/Meteorite/Meteorite.js@c9857ea **/
+/** end meteor/meteor/packages/Meteor/Meteor.js@c9857ea **/
 
 /** begin meteor/meteor/packages/reactive-dict/reactive-dict.js@c9857ea **/
 // XXX come up with a serialization method which canonicalizes object key
@@ -1261,15 +1261,15 @@ _.extend(ReactiveMap.prototype, {
       throw new Error("ReactiveMap.equals: value must be scalar");
     var serializedValue = stringify(value);
 
-    if (Meteorite.active) {
+    if (Meteor.active) {
       self._ensureKey(key);
 
       if (! _.has(self.keyValueDeps[key], serializedValue))
-        self.keyValueDeps[key][serializedValue] = new Meteorite.Dependency;
+        self.keyValueDeps[key][serializedValue] = new Meteor.Dependency;
 
       var isNew = self.keyValueDeps[key][serializedValue].depend();
       if (isNew) {
-        Meteorite.onInvalidate(function () {
+        Meteor.onInvalidate(function () {
           // clean up [key][serializedValue] if it's now empty, so we don't
           // use O(n) memory for n = values seen ever
           if (! self.keyValueDeps[key][serializedValue].hasDependents())
@@ -1286,7 +1286,7 @@ _.extend(ReactiveMap.prototype, {
   _ensureKey: function (key) {
     var self = this;
     if (!(key in self.keyDeps)) {
-      self.keyDeps[key] = new Meteorite.Dependency;
+      self.keyDeps[key] = new Meteor.Dependency;
       self.keyValueDeps[key] = {};
     }
   },
@@ -1335,7 +1335,7 @@ ReactiveVar = function (initialValue, equalsFunc) {
 
   this.curValue = initialValue;
   this.equalsFunc = equalsFunc;
-  this.dep = new Meteorite.Dependency;
+  this.dep = new Meteor.Dependency;
 };
 
 ReactiveVar._isEqual = function (oldValue, newValue) {
@@ -1350,7 +1350,7 @@ ReactiveVar._isEqual = function (oldValue, newValue) {
 };
 
 ReactiveVar.prototype.get = function () {
-  if (Meteorite.active)
+  if (Meteor.active)
     this.dep.depend();
 
   return this.curValue;
@@ -1373,7 +1373,7 @@ ReactiveVar.prototype.toString = function () {
 
 ReactiveVar.prototype._numListeners = function() {
   // Tests want to know.
-  // Accesses a private field of Meteorite.Dependency.
+  // Accesses a private field of Meteor.Dependency.
   var count = 0;
   for (var id in this.dep._dependentsById)
     count++;
@@ -1384,7 +1384,7 @@ ReactiveVar.prototype._numListeners = function() {
 ReactiveObject = function (properties) {
   var self;
   this._definePrivateProperty('_items', {});
-  this._definePrivateProperty('_itemsMeteorite', {});
+  this._definePrivateProperty('_itemsMeteor', {});
   self = this;
   if (_.isArray(properties)) {
     _.each(properties, function(prop) {
@@ -1404,7 +1404,7 @@ ReactiveObject.prototype.wrapArrayMethods = function(name, array){
 
   _.each(methodNames, function(method){
     array[method] = function (){
-      _this._itemsMeteorite[name].changed();
+      _this._itemsMeteor[name].changed();
       return Array.prototype[method].apply(this,arguments);
     }
   });
@@ -1434,10 +1434,10 @@ ReactiveObject.prototype.defineProperty = function(name, value) {
 
 ReactiveObject.prototype.undefineProperty = function(name) {
   var dep;
-  dep = this._itemsMeteorite[name];
+  dep = this._itemsMeteor[name];
   delete this[name];
   delete this._items[name];
-  delete this._itemsMeteorite[name];
+  delete this._itemsMeteor[name];
   if (dep) {
     dep.changed();
   }
@@ -1469,11 +1469,11 @@ ReactiveObject.prototype._propertySet = function(name, value) {
 
   this._items[name] = value;
 
-  if ((_base = this._itemsMeteorite)[name] == null) {
-    _base[name] = new Meteorite.Dependency();
+  if ((_base = this._itemsMeteor)[name] == null) {
+    _base[name] = new Meteor.Dependency();
   }
 
-  if ((_ref = this._itemsMeteorite[name]) != null) {
+  if ((_ref = this._itemsMeteor[name]) != null) {
     _ref.changed();
   }
 
@@ -1481,7 +1481,7 @@ ReactiveObject.prototype._propertySet = function(name, value) {
 };
 
 ReactiveObject.prototype._propertyGet = function(name) {
-  this._itemsMeteorite[name].depend();
+  this._itemsMeteor[name].depend();
   return this._items[name];
 };
 
