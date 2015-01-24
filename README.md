@@ -17,7 +17,7 @@ The decision to choose a JavaScript tool is a complicated one to make already. S
 
 Following the convention of MiniMongo, MiniMeteor exposes a Meteor global. This object's main method of interest is .run- an alias for Tracker.autorun. I thought Tracker was a little too vague, and autorun sounded a bit magical (concealing that the function *is* run immediately, for example). So Meteor.run runs the function you pass it, sets up dependencies, and reruns the function as those dependencies require.
 
-I included ReactiveDict (renamed to ReactiveMap), and the ES5-property based ReactiveObject, but did not yet try to include much beyond that, for lack of a modular build system. See [The Future](#The Future) below..
+I included ReactiveDict (renamed to ReactiveMap), and the ES5-property based ReactiveObject, but did not yet try to include much beyond that, for lack of a modular build system. See [The Future](#the-future) below..
 
 Initially, I created a single JS file containing Tracker and its dependencies. I included underscore, but not JQuery, and put the 30kb minified file on a CDN, in Bower and in Npm as version 1.0.0.
 
