@@ -1,6 +1,6 @@
 {
   "name": "mini-meteor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Select Client-side components of MeteorJS",
   "main": "mini-meteor.js",
   "directories": {

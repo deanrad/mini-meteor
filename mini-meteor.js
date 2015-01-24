@@ -677,7 +677,7 @@ EJSON.newBinary = Base64.newBinary;
 // Package docs at http://docs.meteor.com/#Meteor //
 //////////////////////////////////////////////////
 
-Meteor = {};
+Meteor = {isClient: true}; //patch needed for mini-meteor
 
 // http://docs.meteor.com/#Meteor_active
 

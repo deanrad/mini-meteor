@@ -1,10 +1,10 @@
 {
   "name": "mini-meteor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "authors": [
     "Dean Radcliffe <deanmisc@yahoo.com>"
   ],
-  "description": "Client-side components of MeteorJS. Tracker (renamed Meteorite).",
+  "description": "Client-side components of MeteorJS.",
   "main": "mini-meteor.min.js",
   "moduleType": [
     "globals"
