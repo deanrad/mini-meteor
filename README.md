@@ -3,7 +3,7 @@ Hypothesis: More people would try Meteor if they could evaluate its front-end be
 # The Solution
 I have released a package to Bower, and to Npm, called Mini-Meteor. This gives developers access to the Reactive capabilities of Meteor, including utilities for making reactive JS objects. It can be used as a replacement for Angular, Ember, or Backbone, though it will be most familiar to those accustomed to the Knockout library.
 
-# The Examples (hosted on bl.ocks.org, also in examples/ directory)
+# Live Examples (also in examples/)
 * [Form Validation](https://bl.ocks.org/chicagogrooves/539ec787882f7c9ae67f)
 * [Reactive SVG](https://bl.ocks.org/chicagogrooves/4ba5d0347806c60f120d)
 * TODOMVC - coming soon !
@@ -52,3 +52,6 @@ Anyway, I'd love to hear your thoughts.
 The few fans of other frameworks I showed this code to wondered where all the complexity was, and I explained there just wasn't any!
 I hope this enables you to compare Meteor-style reactive programming with other JS tools, and
 share the Meteoric love with those who are stuck with other servers, or without the freedom to choose a back-end just yet.
+
+# The Mascot
+<img src="http://cdn.meme.am/instances/500x/58452793.jpg" alt="I shall name it Mini-Meteor" height="300" width="300">
