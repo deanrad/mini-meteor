@@ -1,3 +1,8 @@
+Update: Many others are trying to do the same thing, and some are farther along than I. Some possible alternatives:
+
+* http://meteor.github.io/blaze/ (by slava, but old)
+* https://github.com/eface2face/meteor-client
+
 Hypothesis: More people would try Meteor if they could evaluate its front-end behavior first, independently of its server components.
 
 # The Solution
